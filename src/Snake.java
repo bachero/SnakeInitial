@@ -1,4 +1,5 @@
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,43 +24,42 @@ public class Snake {
     public Snake(int row, int col, int size) { // Initial position of the head of the snake and number of inital nodes
         // Finish this method
         body = new ArrayList<>(); 
-        Node node = new Node(row, col - size);
-        body.add(node);
+        for(int i=0; i < size; i++){
+            Node node = new Node(row, col - i);
+            body.add(node);
+        }
+       
     }
     
     public boolean canMove(int row, int col) {
-        // Finish this method
-        return true;
+        // Finish this method   
+        if(row >= 0 || col >= 0 || row <= Board.NUM_ROWS || col <= Board.NUM_COLS){
+            return true;    
+        }
+        return false;
     }
     
-    public void paint(Graphics g, int squareWidth, int squareHeight) {
-        // Finish this method. Call Util.drawSquare()
+    public void paintSnake(Graphics g, int squareWidth, int squareHeight) {
+        for(Node node: body){
+            Util.drawSquare(g, node.getRow(), node.getCol(), squareWidth, squareHeight, Color.red);
+        }
     }
     
     public void move() {
-        // Finish this method
         int row = body.get(0).getRow();
         int col = body.get(0).getCol();
         switch (direction) {
             case UP:
-                if (direction == Direction.DOWN) {
-                    body.add(0, new Node(row - 1, col));
-                }
+                body.add(0, new Node(row + 1, col));
                 break;
             case DOWN:
-                if (direction != Direction.UP) {
-                
-                }
+                body.add(0, new Node(row - 1, col));
                 break;
             case LEFT:
-                if (direction != Direction.RIGHT) {
-            
-                }
+                body.add(0, new Node(row, col - 1));
                 break;
             case RIGHT:
-                if (direction != Direction.LEFT) {
-               
-                }
+                body.add(0, new Node(row, col + 1));
                 break;
         }
 
