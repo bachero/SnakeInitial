@@ -13,7 +13,8 @@ import java.util.Timer;
  * @author victoralonso
  */
 public class Board extends javax.swing.JPanel {
-    
+    public static final int NUM_ROWS = 20;
+    public static final int NUM_COLS = 20;
     private int numRows;
     private int numCols;
     private Snake snake;
