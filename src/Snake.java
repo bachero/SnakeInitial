@@ -28,12 +28,16 @@ public class Snake {
             Node node = new Node(row, col - i);
             body.add(node);
         }
-       
+        direction = direction.DOWN;
+    }
+    
+    public List<Node> getList(){
+        return body;
     }
     
     public boolean canMove(int row, int col) {
         // Finish this method   
-        if(row >= 0 || col >= 0 || row <= Board.NUM_ROWS || col <= Board.NUM_COLS){
+        if(row >= 0 || col >= 0 || row <= AspectsConfig.NUM_ROWS || col <= AspectsConfig.NUM_COLS){
             return true;    
         }
         return false;
@@ -62,11 +66,20 @@ public class Snake {
                 body.add(0, new Node(row, col + 1));
                 break;
         }
+    
+    }
 
-
+    public void remainingNodes(){
         
     }
     
+    public void setDirection(Direction direction){
+        this.direction = direction;
+    }
+    
+    public Direction getDirection(){
+        return direction;
+    }
     
     
 }

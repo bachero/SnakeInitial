@@ -1,6 +1,10 @@
 
+import java.awt.Color;
 import java.awt.Graphics;
-import java.util.Timer;
+import java.awt.Graphics2D;
+import java.awt.Toolkit;
+import java.awt.event.*;
+import javax.swing.Timer;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -13,8 +17,8 @@ import java.util.Timer;
  * @author victoralonso
  */
 public class Board extends javax.swing.JPanel {
-    public static final int NUM_ROWS = 20;
-    public static final int NUM_COLS = 20;
+    
+    private ScoreBoard scoreBoard;
     private int numRows;
     private int numCols;
     private Snake snake;
@@ -22,22 +26,81 @@ public class Board extends javax.swing.JPanel {
     private Food specialFood;
     private Timer snakeTimer;
     private Timer specialFoodTimer;
-    private int DeltaTime;
-
+    private int deltaTime;
+    private final int INITIAL_DELTA_TIME = 300;
+    
     /**
      * Creates new form Board
      */
+    class MyKeyAdapter extends KeyAdapter {
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            switch (e.getKeyCode()) {
+                case KeyEvent.VK_LEFT:
+                    if(snake.getDirection() != Direction.RIGHT){
+                        snake.setDirection(Direction.LEFT);
+                    }
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    if(snake.getDirection() != Direction.LEFT){
+                        snake.setDirection(Direction.RIGHT);
+                    }
+                    break;
+                case KeyEvent.VK_UP:
+                    if(snake.getDirection() != Direction.DOWN){
+                        snake.setDirection(Direction.UP);
+                    }
+                    break;
+                case KeyEvent.VK_DOWN:
+                    if(snake.getDirection() != Direction.UP){
+                        snake.setDirection(Direction.DOWN);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            repaint();
+        }
+    }
+    
+    
     public Board() {
         initComponents();
         myInit();
+       
     }
     
     private void myInit() {
         // Finish this method
+        setFocusable(true);
+        snake = new Snake(10, 10, 1);
+        food = new Food(snake, false);
+        addKeyListener(new MyKeyAdapter());
+        deltaTime = INITIAL_DELTA_TIME;
+        
+        
+    }
+    
+     private void createTimer(){
+        snakeTimer = new Timer(deltaTime, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                
+            }
+        });
     }
     
     public Board(int numRows, int numCols) {
         // Finish this method
+        initComponents();
+        myInit();
+        this.numRows = numRows;
+        this.numCols = numCols;
+    }
+    
+    public void setScoreBoard(ScoreBoard scoreBoard){
+        this.scoreBoard = scoreBoard;
     }
     
     public boolean colideFood() {
@@ -53,7 +116,12 @@ public class Board extends javax.swing.JPanel {
     protected void paintComponent(Graphics g)  {
         // Finish this method
         // Paint the Snake and the food here
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        snake.paintSnake(g2d, WIDTH, HEIGHT);
     }
+    
+   
 
     /**
      * This method is called from within the constructor to initialize the form.

@@ -1,4 +1,5 @@
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.util.List;
 
@@ -16,36 +17,47 @@ public class Food {
     private Node position;
     private boolean isSpecial;
     
-    public Food(Snake snake) { 
+    public Food(Snake snake, boolean isSpecial) { 
         // We pass Snake to the constructor because if the randomnly generated food
         // falls on the Snake you have to create another position for the food
         position = generateFood(snake);
+        this.isSpecial = isSpecial;
     }
     
     public Node generateFood(Snake snake){
-        position = new Node((int)(Math.random()*(Board.NUM_ROWS -1)), (int)(Math.random()*(Board.NUM_COLS -1)));
         List<Node> posSnake = snake.getList();
-        boolean colision = false;
-        boolean notColision = true;
+        boolean colision = true;
         Node food = null;
-        while(!colision){    
+        while(colision){
+            position = new Node((int)(Math.random()*(AspectsConfig.NUM_ROWS -1)), (int)(Math.random()*(AspectsConfig.NUM_COLS -1)));
+            colision = false;
             for(Node a: posSnake){
                 if(a == position){
-                    notColision = false;
+                    colision = true;
                     break;
                 }
             }
-            colision = true;
-        }
-        if(notColision){
-            food = position;
         }
         return food;
     }
     
     public void paint(Graphics g, int squareWidth, int squareHeight) {
         // Finish this method. Call Util.drawSquare()
+        if(isSpecial){
+            Util.drawSquare(g, squareWidth, squareWidth, squareWidth, squareHeight, Color.BLUE);
+        } else {
+            Util.drawSquare(g, squareWidth, squareWidth, squareWidth, squareHeight, Color.GREEN);
+        }
+        
     }
     
+    public boolean isSpecial(){
+        return isSpecial;
+    }
+    
+    public Node getPosition(){
+        return position;
+    }
+            
     // Create all the methods you need here
 }
