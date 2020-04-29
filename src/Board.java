@@ -86,10 +86,16 @@ public class Board extends javax.swing.JPanel {
         snakeTimer = new Timer(deltaTime, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                
+                loop();
             }
         });
     }
+     
+    private void loop(){
+        //if(snake.canMove()){
+            
+        //}
+    } 
     
     public Board(int numRows, int numCols) {
         // Finish this method
@@ -112,14 +118,45 @@ public class Board extends javax.swing.JPanel {
         // Finish this method
     }
     
+    private int squareWidth(){
+        return getWidth() / AspectsConfig.NUM_COLS;
+    }
+    
+    private int squareHeight(){
+        return getHeight() / AspectsConfig.NUM_ROWS;
+    }
+    
+    private void drawSquare(Graphics g, int row, int col, int squareWidth, int squareHeight, Color color){
+        int x = col * squareWidth;
+        int y = row * squareHeight;
+        g.drawLine(x, y + squareHeight - 1, x, y);
+        g.drawLine(x, y, x + squareWidth - 1, y);
+        g.drawLine(x + 1, y + squareHeight - 1,
+        x + squareWidth - 1, y + squareHeight - 1);
+        g.drawLine(x + squareWidth - 1,
+        y + squareHeight - 1,
+        x + squareWidth - 1, y + 1);
+    }
+    
+    private void drawBoard(Graphics2D g2d){
+        for(int row = 0; row < AspectsConfig.NUM_ROWS; row++){
+            for(int col = 0; col < AspectsConfig.NUM_COLS; col++){
+                drawSquare(g2d, row, col, squareWidth(), squareHeight(), Color.DARK_GRAY);
+            }
+        }
+    }
+    
     @Override 
     protected void paintComponent(Graphics g)  {
         // Finish this method
         // Paint the Snake and the food here
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        snake.paintSnake(g2d, WIDTH, HEIGHT);
+        snake.paintSnake(g2d, squareWidth(), squareHeight());
+        food.paint(g, squareWidth(), squareHeight());
     }
+    
+    
     
    
 
