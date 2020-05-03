@@ -31,12 +31,18 @@ public class Snake {
         direction = direction.DOWN;
     }
     
+    public Node getHeader(){
+        return body.get(0);
+    }
+    
     public List<Node> getList(){
         return body;
     }
     
-    public boolean canMove(int row, int col) {
-        // Finish this method   
+    public boolean canMove() {
+        // Finish this method
+        int row = body.get(0).getRow();
+        int col = body.get(0).getCol();
         if(row >= 0 || col >= 0 || row <= AspectsConfig.NUM_ROWS || col <= AspectsConfig.NUM_COLS){
             return true;    
         }
@@ -54,23 +60,35 @@ public class Snake {
         int col = body.get(0).getCol();
         switch (direction) {
             case UP:
-                body.add(0, new Node(row + 1, col));
+                remainingNodesToMove(row + 1, col);
                 break;
             case DOWN:
-                body.add(0, new Node(row - 1, col));
+                remainingNodesToMove(row - 1, col);
                 break;
             case LEFT:
-                body.add(0, new Node(row, col - 1));
+                remainingNodesToMove(row, col - 1);
                 break;
             case RIGHT:
-                body.add(0, new Node(row, col + 1));
+                remainingNodesToMove(row, col + 1);
                 break;
         }
     
     }
-
-    public void remainingNodes(){
+    
+    public void remainingNodesToMove(int row, int col){
+  
+        body.add(0, new Node(row, col));
+        if (remainingNodesToCreate == 0) {
+            body.remove(body.size() - 1);
+        } else {
+            remainingNodesToCreate --;
+        }
         
+    }
+        
+
+    public void setRemainingNodes(int remainingNodesToCreate){
+        this.remainingNodesToCreate += remainingNodesToCreate;
     }
     
     public void setDirection(Direction direction){
@@ -80,6 +98,10 @@ public class Snake {
     public Direction getDirection(){
         return direction;
     }
+    
+    public int getSize(){
+       return body.size();
+    } 
     
     
 }

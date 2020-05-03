@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.event.*;
+import java.util.List;
 import javax.swing.Timer;
 
 /*
@@ -18,6 +19,7 @@ import javax.swing.Timer;
  */
 public class Board extends javax.swing.JPanel {
     
+    private List<Player> player;
     private ScoreBoard scoreBoard;
     private int numRows;
     private int numCols;
@@ -28,6 +30,8 @@ public class Board extends javax.swing.JPanel {
     private Timer specialFoodTimer;
     private int deltaTime;
     private final int INITIAL_DELTA_TIME = 300;
+    private final int NORMAL_FOOD = 1;
+    private final int SPECIAL_FOOD = 4;
     
     /**
      * Creates new form Board
@@ -82,7 +86,7 @@ public class Board extends javax.swing.JPanel {
         
     }
     
-     private void createTimer(){
+     private void createSnakeTimer(){
         snakeTimer = new Timer(deltaTime, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -91,10 +95,35 @@ public class Board extends javax.swing.JPanel {
         });
     }
      
+    private void createSpecialTimer(){
+        specialFoodTimer = new Timer(deltaTime, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                loop();
+            }
+        });
+    }
+     
     private void loop(){
-        //if(snake.canMove()){
-            
-        //}
+        //Method of SnakeTimer
+        if(snake.canMove()){
+            gameOver(); 
+        } else {
+           scoreBoard.setScore(snake.getSize());
+           repaint();
+           
+        }
+    }
+    
+    private void specialLoop(){
+        //Method of SnakeFoodTimer
+        if(snake.canMove()){
+            gameOver(); 
+        } else {
+           scoreBoard.setScore(snake.getSize());
+           repaint();
+           
+        }
     } 
     
     public Board(int numRows, int numCols) {
@@ -110,7 +139,15 @@ public class Board extends javax.swing.JPanel {
     }
     
     public boolean colideFood() {
-        // Finish this method
+        return colideNormalFood() || colideSpecialFood();
+    }
+    
+    private boolean colideNormalFood() {
+        Node head = snake.getHeader();
+        return food.getPosition().getCol() == head.getCol() || food.getPosition().getRow() == head.getRow();
+    }
+
+    private boolean colideSpecialFood() {
         return false;
     }
     
