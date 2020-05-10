@@ -40,13 +40,22 @@ public class Snake {
     }
     
     public boolean canMove() {
-        // Finish this method
-        int row = body.get(0).getRow();
-        int col = body.get(0).getCol();
-        if(row >= 0 || col >= 0 || row <= AspectsConfig.NUM_ROWS || col <= AspectsConfig.NUM_COLS){
-            return true;    
+        Node firstNode = body.get(0);
+        if(firstNode.getCol() < 0 || firstNode.getCol() >= AspectsConfig.NUM_COLS || 
+                firstNode.getRow() < 0 || firstNode.getRow() >= AspectsConfig.NUM_ROWS){
+            move();
+            return true;
+        } else {
+            Node node;
+            for (int i = 1; i < body.size(); i++) {
+                node = body.get(i);
+                if(node.getCol() == firstNode.getCol() && node.getRow() == firstNode.getRow()){
+                    move();
+                    return true;
+                }
+            }
+            return false;
         }
-        return false;
     }
     
     public void paintSnake(Graphics g, int squareWidth, int squareHeight) {
@@ -75,6 +84,7 @@ public class Snake {
     
     }
     
+        
     public void remainingNodesToMove(int row, int col){
   
         body.add(0, new Node(row, col));

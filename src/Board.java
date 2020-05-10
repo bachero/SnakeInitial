@@ -32,6 +32,7 @@ public class Board extends javax.swing.JPanel {
     private final int INITIAL_DELTA_TIME = 300;
     private final int NORMAL_FOOD = 1;
     private final int SPECIAL_FOOD = 4;
+    private boolean specialFoodOn;
     
     /**
      * Creates new form Board
@@ -78,11 +79,12 @@ public class Board extends javax.swing.JPanel {
     private void myInit() {
         // Finish this method
         setFocusable(true);
-        snake = new Snake(10, 10, 1);
+        snake = new Snake(5, 5, 1);
         food = new Food(snake, false);
         addKeyListener(new MyKeyAdapter());
         deltaTime = INITIAL_DELTA_TIME;
-        
+        createSnakeTimer();
+        createSpecialTimer();
         
     }
     
@@ -99,31 +101,48 @@ public class Board extends javax.swing.JPanel {
         specialFoodTimer = new Timer(deltaTime, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                loop();
+                specialLoop();
             }
         });
     }
      
     private void loop(){
         //Method of SnakeTimer
-        if(snake.canMove()){
+        if(!snake.canMove()){
             gameOver(); 
         } else {
-           scoreBoard.setScore(snake.getSize());
-           repaint();
-           
+           if(colideFood()){
+               if(colideNormalFood()){
+                    snake.setRemainingNodes(1);
+                    food = new Food(snake, true);
+                    scoreBoard.setScore(snake.getSize());
+                } else {
+                    snake.setRemainingNodes(4);
+                    food = new Food(snake, true);
+                    scoreBoard.setScore(snake.getSize());
+                   
+               }
+               repaint();
+           }
+        
+        
         }
     }
-    
     private void specialLoop(){
         //Method of SnakeFoodTimer
-        if(snake.canMove()){
-            gameOver(); 
+         if (!specialFoodOn) {
+            specialFood = new Food(snake, true);
+            specialFoodOn = true;
+            int randomTimer = (int) (Math.random() * 10000 + 30000);
+            specialFoodTimer.setDelay(randomTimer);
         } else {
-           scoreBoard.setScore(snake.getSize());
-           repaint();
-           
+            food = new Food(snake, false);
+            specialFoodOn = false;
+            int randomTimer = (int) (Math.random() * 5000 + 7000);
+            specialFoodTimer.setDelay(randomTimer);
         }
+        repaint();
+            
     } 
     
     public Board(int numRows, int numCols) {
@@ -148,11 +167,15 @@ public class Board extends javax.swing.JPanel {
     }
 
     private boolean colideSpecialFood() {
-        return false;
+        if(specialFoodOn){
+            Node head = snake.getHeader();
+            return specialFood.getPosition().getCol() == head.getCol() || specialFood.getPosition().getRow() == head.getRow();
+        }
+        return false; 
     }
     
     public void gameOver() {
-        // Finish this method
+        stopTimers();
     }
     
     private int squareWidth(){
@@ -163,11 +186,16 @@ public class Board extends javax.swing.JPanel {
         return getHeight() / AspectsConfig.NUM_ROWS;
     }
     
-    private void drawSquare(Graphics g, int row, int col, int squareWidth, int squareHeight, Color color){
+    public static void drawSquare(Graphics g, int row, int col, int squareWidth, int squareHeight, Color color) {
         int x = col * squareWidth;
         int y = row * squareHeight;
+        g.setColor(color);
+        g.fillRect(x + 1, y + 1, squareWidth - 2,
+        squareHeight - 2);
+        g.setColor(color.brighter());
         g.drawLine(x, y + squareHeight - 1, x, y);
         g.drawLine(x, y, x + squareWidth - 1, y);
+        g.setColor(color.darker());
         g.drawLine(x + 1, y + squareHeight - 1,
         x + squareWidth - 1, y + squareHeight - 1);
         g.drawLine(x + squareWidth - 1,
@@ -183,12 +211,18 @@ public class Board extends javax.swing.JPanel {
         }
     }
     
+    public void stopTimers(){
+        snakeTimer.stop();
+        specialFoodTimer.stop();
+    }
+    
     @Override 
     protected void paintComponent(Graphics g)  {
         // Finish this method
         // Paint the Snake and the food here
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
+        drawBoard(g2d);
         snake.paintSnake(g2d, squareWidth(), squareHeight());
         food.paint(g, squareWidth(), squareHeight());
     }
