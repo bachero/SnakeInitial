@@ -81,11 +81,18 @@ public class Board extends javax.swing.JPanel {
         setFocusable(true);
         snake = new Snake(5, 5, 1);
         food = new Food(snake, false);
-        addKeyListener(new MyKeyAdapter());
+        MyKeyAdapter keyAdapter = new MyKeyAdapter();
+        addKeyListener(keyAdapter);
         deltaTime = INITIAL_DELTA_TIME;
         createSnakeTimer();
         createSpecialTimer();
+        startTimers();
         
+    }
+    
+    public void startTimers() {
+        snakeTimer.start();
+        specialFoodTimer.start();
     }
     
      private void createSnakeTimer(){
@@ -186,27 +193,12 @@ public class Board extends javax.swing.JPanel {
         return getHeight() / AspectsConfig.NUM_ROWS;
     }
     
-    public static void drawSquare(Graphics g, int row, int col, int squareWidth, int squareHeight, Color color) {
-        int x = col * squareWidth;
-        int y = row * squareHeight;
-        g.setColor(color);
-        g.fillRect(x + 1, y + 1, squareWidth - 2,
-        squareHeight - 2);
-        g.setColor(color.brighter());
-        g.drawLine(x, y + squareHeight - 1, x, y);
-        g.drawLine(x, y, x + squareWidth - 1, y);
-        g.setColor(color.darker());
-        g.drawLine(x + 1, y + squareHeight - 1,
-        x + squareWidth - 1, y + squareHeight - 1);
-        g.drawLine(x + squareWidth - 1,
-        y + squareHeight - 1,
-        x + squareWidth - 1, y + 1);
-    }
+   
     
     private void drawBoard(Graphics2D g2d){
         for(int row = 0; row < AspectsConfig.NUM_ROWS; row++){
             for(int col = 0; col < AspectsConfig.NUM_COLS; col++){
-                drawSquare(g2d, row, col, squareWidth(), squareHeight(), Color.DARK_GRAY);
+                Util.drawSquare(g2d, row, col, squareWidth(), squareHeight(), Color.DARK_GRAY);
             }
         }
     }
