@@ -1,6 +1,7 @@
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,17 +45,18 @@ public class Snake {
         if(firstNode.getCol() < 0 || firstNode.getCol() >= AspectsConfig.NUM_COLS || 
                 firstNode.getRow() < 0 || firstNode.getRow() >= AspectsConfig.NUM_ROWS){
             move();
-            return true;
+            return false;
         } else {
             Node node;
             for (int i = 1; i < body.size(); i++) {
                 node = body.get(i);
                 if(node.getCol() == firstNode.getCol() && node.getRow() == firstNode.getRow()){
                     move();
-                    return true;
+                    return false;
                 }
             }
-            return false;
+            move();
+            return true;
         }
     }
     
@@ -65,14 +67,15 @@ public class Snake {
     }
     
     public void move() {
+        Toolkit.getDefaultToolkit().sync();
         int row = body.get(0).getRow();
         int col = body.get(0).getCol();
         switch (direction) {
             case UP:
-                remainingNodesToMove(row + 1, col);
+                remainingNodesToMove(row - 1, col);
                 break;
             case DOWN:
-                remainingNodesToMove(row - 1, col);
+                remainingNodesToMove(row + 1, col);
                 break;
             case LEFT:
                 remainingNodesToMove(row, col - 1);

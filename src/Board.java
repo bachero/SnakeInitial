@@ -4,7 +4,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
 /*
@@ -19,7 +22,7 @@ import javax.swing.Timer;
  */
 public class Board extends javax.swing.JPanel {
     
-    private List<Player> player;
+    private List<Player> players;
     private ScoreBoard scoreBoard;
     private int numRows;
     private int numCols;
@@ -29,6 +32,7 @@ public class Board extends javax.swing.JPanel {
     private Timer snakeTimer;
     private Timer specialFoodTimer;
     private int deltaTime;
+    private int foodDeltaTime;
     private final int INITIAL_DELTA_TIME = 300;
     private final int NORMAL_FOOD = 1;
     private final int SPECIAL_FOOD = 4;
@@ -78,12 +82,16 @@ public class Board extends javax.swing.JPanel {
     
     private void myInit() {
         // Finish this method
+        Player p = new Player("Default", 0);
+        List<Player> players = new ArrayList<>();
         setFocusable(true);
         snake = new Snake(5, 5, 1);
         food = new Food(snake, false);
+        specialFood = new Food(snake, true);
         MyKeyAdapter keyAdapter = new MyKeyAdapter();
         addKeyListener(keyAdapter);
         deltaTime = INITIAL_DELTA_TIME;
+        foodDeltaTime = 15000;
         createSnakeTimer();
         createSpecialTimer();
         startTimers();
@@ -95,6 +103,12 @@ public class Board extends javax.swing.JPanel {
         specialFoodTimer.start();
     }
     
+    public void restartTimers() {
+        snakeTimer.restart();
+        specialFoodTimer.restart();
+    }
+    
+    
      private void createSnakeTimer(){
         snakeTimer = new Timer(deltaTime, new ActionListener() {
             @Override
@@ -105,7 +119,7 @@ public class Board extends javax.swing.JPanel {
     }
      
     private void createSpecialTimer(){
-        specialFoodTimer = new Timer(deltaTime, new ActionListener() {
+        specialFoodTimer = new Timer(foodDeltaTime, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 specialLoop();
@@ -121,16 +135,21 @@ public class Board extends javax.swing.JPanel {
            if(colideFood()){
                if(colideNormalFood()){
                     snake.setRemainingNodes(1);
-                    food = new Food(snake, true);
-                    scoreBoard.setScore(snake.getSize());
+                    food = new Food(snake, false);
+                    scoreBoard.incrementScore(NORMAL_FOOD);
+                    System.out.println("Normal");
                 } else {
                     snake.setRemainingNodes(4);
-                    food = new Food(snake, true);
-                    scoreBoard.setScore(snake.getSize());
+                    scoreBoard.incrementScore(SPECIAL_FOOD);
+                    System.out.println("Especial");
+                    food = new Food(snake, false);
+
                    
                }
-               repaint();
+               
            }
+        repaint();
+        Toolkit.getDefaultToolkit().sync();
         
         
         }
@@ -138,12 +157,13 @@ public class Board extends javax.swing.JPanel {
     private void specialLoop(){
         //Method of SnakeFoodTimer
          if (!specialFoodOn) {
+            food.desapear();
+            System.out.println("Va");
             specialFood = new Food(snake, true);
             specialFoodOn = true;
             int randomTimer = (int) (Math.random() * 10000 + 30000);
             specialFoodTimer.setDelay(randomTimer);
         } else {
-            food = new Food(snake, false);
             specialFoodOn = false;
             int randomTimer = (int) (Math.random() * 5000 + 7000);
             specialFoodTimer.setDelay(randomTimer);
@@ -169,20 +189,45 @@ public class Board extends javax.swing.JPanel {
     }
     
     private boolean colideNormalFood() {
-        Node head = snake.getHeader();
-        return food.getPosition().getCol() == head.getCol() || food.getPosition().getRow() == head.getRow();
+        if(!specialFoodOn){
+            Node head = snake.getHeader();
+            return food.getPosition().getCol() == head.getCol() && food.getPosition().getRow() == head.getRow();
+        }
+        return false;
     }
 
     private boolean colideSpecialFood() {
         if(specialFoodOn){
             Node head = snake.getHeader();
-            return specialFood.getPosition().getCol() == head.getCol() || specialFood.getPosition().getRow() == head.getRow();
+            return specialFood.getPosition().getCol() == head.getCol() && specialFood.getPosition().getRow() == head.getRow();
         }
         return false; 
     }
     
     public void gameOver() {
         stopTimers();
+        int score = scoreBoard.getScore();
+        JOptionPane.showMessageDialog(null,
+        "Game Over.\nYour size has been " + score);
+        String nombre = JOptionPane.showInputDialog("Write your name.");
+        if(nombre == null || nombre.equals("")){
+            System.out.println("Null Name");
+        } else {
+            Player p = new Player(nombre, score);
+            players.add(p);
+            Collections.sort(players);
+            JOptionPane.showMessageDialog(null,"High Scores:\n1. " + players.get(0) + "\n2. " + 
+            players.get(1) + "\n3. " + players.get(2)+ "\n4. " + players.get(3)+ "\n4. " + players.get(4));
+        }
+        startNewGame();
+    }
+        
+    
+    public void startNewGame() {
+        snake = new Snake(5, 5, 1);
+        food = new Food(snake, false);
+        specialFood = new Food(snake, true);
+        restartTimers();
     }
     
     private int squareWidth(){
@@ -216,7 +261,12 @@ public class Board extends javax.swing.JPanel {
         Graphics2D g2d = (Graphics2D) g;
         drawBoard(g2d);
         snake.paintSnake(g2d, squareWidth(), squareHeight());
-        food.paint(g, squareWidth(), squareHeight());
+        if(specialFoodOn){
+            specialFood.paint(g, squareWidth(), squareHeight());
+        } else {
+            food.paint(g, squareWidth(), squareHeight());
+        }
+        
     }
     
     

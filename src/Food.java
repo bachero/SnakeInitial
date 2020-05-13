@@ -38,17 +38,22 @@ public class Food {
                 }
             }
         }
-        return food;
+        return position;
     }
     
     public void paint(Graphics g, int squareWidth, int squareHeight) {
         // Finish this method. Call Util.drawSquare()
         if(isSpecial){
-            Util.drawSquare(g, squareWidth, squareWidth, squareWidth, squareHeight, Color.BLUE);
+            Util.drawSquare(g, position.getRow(), position.getCol(), squareWidth, squareHeight, Color.RED);
         } else {
-            Util.drawSquare(g, squareWidth, squareWidth, squareWidth, squareHeight, Color.GREEN);
+            Util.drawSquare(g, position.getRow(), position.getCol(), squareWidth, squareHeight, Color.GREEN);
         }
         
+    }
+    
+    public void desapear() {    
+        position.setCol(-1);
+        position.setRow(-1);
     }
     
     public boolean isSpecial(){
@@ -57,6 +62,10 @@ public class Food {
     
     public Node getPosition(){
         return position;
+    }
+    
+    public void setSpecial(boolean food) {
+        this.isSpecial = food;
     }
             
     // Create all the methods you need here

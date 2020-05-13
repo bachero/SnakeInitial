@@ -35,6 +35,7 @@ public class Player implements Comparable <Player>, Serializable {
         namePlayer = newPlayer;
     }
     
+    
     public int getScore(){
         return score;
     }
