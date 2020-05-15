@@ -30,6 +30,7 @@ public class ScoreBoard extends javax.swing.JPanel {
     public void incrementScore(int increment) {
         // Finish this method. And add all you need to the class
         score += increment;
+        jLabel1.setText(score + " ");
     }
 
     /**

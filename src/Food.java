@@ -27,7 +27,6 @@ public class Food {
     public Node generateFood(Snake snake){
         List<Node> posSnake = snake.getList();
         boolean colision = true;
-        Node food = null;
         while(colision){
             position = new Node((int)(Math.random()*(AspectsConfig.NUM_ROWS -1)), (int)(Math.random()*(AspectsConfig.NUM_COLS -1)));
             colision = false;
@@ -46,7 +45,7 @@ public class Food {
         if(isSpecial){
             Util.drawSquare(g, position.getRow(), position.getCol(), squareWidth, squareHeight, Color.RED);
         } else {
-            Util.drawSquare(g, position.getRow(), position.getCol(), squareWidth, squareHeight, Color.GREEN);
+            Util.drawSquare(g, position.getRow(), position.getCol(), squareWidth, squareHeight, Color.YELLOW);
         }
         
     }

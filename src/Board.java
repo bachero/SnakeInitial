@@ -33,7 +33,7 @@ public class Board extends javax.swing.JPanel {
     private Timer specialFoodTimer;
     private int deltaTime;
     private int foodDeltaTime;
-    private final int INITIAL_DELTA_TIME = 300;
+    private final int INITIAL_DELTA_TIME = 100;
     private final int NORMAL_FOOD = 1;
     private final int SPECIAL_FOOD = 4;
     private boolean specialFoodOn;
@@ -82,8 +82,8 @@ public class Board extends javax.swing.JPanel {
     
     private void myInit() {
         // Finish this method
-        Player p = new Player("Default", 0);
-        List<Player> players = new ArrayList<>();
+        specialFoodOn = false;
+        players = new ArrayList<>();
         setFocusable(true);
         snake = new Snake(5, 5, 1);
         food = new Food(snake, false);
@@ -106,6 +106,9 @@ public class Board extends javax.swing.JPanel {
     public void restartTimers() {
         snakeTimer.restart();
         specialFoodTimer.restart();
+        specialFoodTimer.setDelay(foodDeltaTime);
+        snakeTimer.setDelay(INITIAL_DELTA_TIME);
+        
     }
     
     
@@ -139,11 +142,10 @@ public class Board extends javax.swing.JPanel {
                     scoreBoard.incrementScore(NORMAL_FOOD);
                     System.out.println("Normal");
                 } else {
+                    specialFood = new Food(snake, true);
                     snake.setRemainingNodes(4);
                     scoreBoard.incrementScore(SPECIAL_FOOD);
                     System.out.println("Especial");
-                    food = new Food(snake, false);
-
                    
                }
                
@@ -157,20 +159,24 @@ public class Board extends javax.swing.JPanel {
     private void specialLoop(){
         //Method of SnakeFoodTimer
          if (!specialFoodOn) {
-            food.desapear();
             System.out.println("Va");
             specialFood = new Food(snake, true);
             specialFoodOn = true;
+            int random = (int) (Math.random() * 10 + 50);
             int randomTimer = (int) (Math.random() * 10000 + 30000);
+            snakeTimer.setDelay(random);
             specialFoodTimer.setDelay(randomTimer);
         } else {
             specialFoodOn = false;
+            specialFood.desapear();
             int randomTimer = (int) (Math.random() * 5000 + 7000);
             specialFoodTimer.setDelay(randomTimer);
+            snakeTimer.setDelay(INITIAL_DELTA_TIME);
+            System.out.println("No va");
         }
         repaint();
             
-    } 
+    }  
     
     public Board(int numRows, int numCols) {
         // Finish this method
@@ -216,8 +222,10 @@ public class Board extends javax.swing.JPanel {
             Player p = new Player(nombre, score);
             players.add(p);
             Collections.sort(players);
-            JOptionPane.showMessageDialog(null,"High Scores:\n1. " + players.get(0) + "\n2. " + 
-            players.get(1) + "\n3. " + players.get(2)+ "\n4. " + players.get(3)+ "\n4. " + players.get(4));
+        }
+        if(players.size() >= 3){
+            JOptionPane.showMessageDialog(null,"High Scores:\n1. " + players.get(0).toString() + "\n2. " + 
+            players.get(1).toString() + "\n3. " + players.get(2).toString());
         }
         startNewGame();
     }
@@ -227,7 +235,17 @@ public class Board extends javax.swing.JPanel {
         snake = new Snake(5, 5, 1);
         food = new Food(snake, false);
         specialFood = new Food(snake, true);
+        scoreBoard.setScore(0);
+        specialFoodOn = false;
+        setFocusable(true);
+        specialFood = new Food(snake, true);
+        MyKeyAdapter keyAdapter = new MyKeyAdapter();
+        addKeyListener(keyAdapter);
+        deltaTime = INITIAL_DELTA_TIME;
+        foodDeltaTime = 15000;
         restartTimers();
+        
+                
     }
     
     private int squareWidth(){

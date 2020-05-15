@@ -39,12 +39,17 @@ public class Player implements Comparable <Player>, Serializable {
     public int getScore(){
         return score;
     }
+    
+    @Override
+    public String toString(){
+        return "Name: " + namePlayer + "  Score: " + score;
+    }
 
     @Override
     public int compareTo(Player arg0) {
-        if(score > arg0.score){
+        if(score < arg0.score){
             return 1;
-        } else if(score < arg0.score){
+        } else if(score > arg0.score){
             return -1;
         } else {
             return 0;

@@ -62,7 +62,7 @@ public class Snake {
     
     public void paintSnake(Graphics g, int squareWidth, int squareHeight) {
         for(Node node: body){
-            Util.drawSquare(g, node.getRow(), node.getCol(), squareWidth, squareHeight, Color.red);
+            Util.drawSquare(g, node.getRow(), node.getCol(), squareWidth, squareHeight, Color.green);
         }
     }
     
