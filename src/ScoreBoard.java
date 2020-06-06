@@ -8,7 +8,7 @@
  *
  * @author victoralonso
  */
-public class ScoreBoard extends javax.swing.JPanel {
+public class ScoreBoard extends javax.swing.JPanel implements ScoreBehaviour{
     
     private int score;
 
@@ -20,17 +20,21 @@ public class ScoreBoard extends javax.swing.JPanel {
         jLabel1.setText("Size: " + score);
     }
     
+    @Override
     public int getScore(){
         return score;
     }
     
-    public void setScore(int score){
-        this.score = score;
-    }
+    @Override
     public void incrementScore(int increment) {
         // Finish this method. And add all you need to the class
         score += increment;
         jLabel1.setText(score + " ");
+    }
+    
+    @Override
+    public void resetScore(){
+        this.score = 0;
     }
 
     /**

@@ -23,7 +23,7 @@ import javax.swing.Timer;
 public class Board extends javax.swing.JPanel {
     
     private List<Player> players;
-    private ScoreBoard scoreBoard;
+    //private ScoreBoard scoreBoard;
     private int numRows;
     private int numCols;
     private Snake snake;
@@ -32,11 +32,14 @@ public class Board extends javax.swing.JPanel {
     private Timer snakeTimer;
     private Timer specialFoodTimer;
     private int deltaTime;
-    private int foodDeltaTime;
+    private int specialFoodDeltaTime;
     private final int INITIAL_DELTA_TIME = 100;
     private final int NORMAL_FOOD = 1;
     private final int SPECIAL_FOOD = 4;
     private boolean specialFoodOn;
+    private boolean girando;
+    private ScoreBehaviour scoreDelegate; 
+
     
     /**
      * Creates new form Board
@@ -45,29 +48,35 @@ public class Board extends javax.swing.JPanel {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            switch (e.getKeyCode()) {
-                case KeyEvent.VK_LEFT:
-                    if(snake.getDirection() != Direction.RIGHT){
-                        snake.setDirection(Direction.LEFT);
-                    }
-                    break;
-                case KeyEvent.VK_RIGHT:
-                    if(snake.getDirection() != Direction.LEFT){
-                        snake.setDirection(Direction.RIGHT);
-                    }
-                    break;
-                case KeyEvent.VK_UP:
-                    if(snake.getDirection() != Direction.DOWN){
-                        snake.setDirection(Direction.UP);
-                    }
-                    break;
-                case KeyEvent.VK_DOWN:
-                    if(snake.getDirection() != Direction.UP){
-                        snake.setDirection(Direction.DOWN);
-                    }
-                    break;
-                default:
-                    break;
+            if(girando != true){
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_LEFT:
+                        if(snake.getDirection() != Direction.RIGHT){
+                            snake.setDirection(Direction.LEFT);
+                            girando = true;
+                        }
+                        break;
+                    case KeyEvent.VK_RIGHT:
+                        if(snake.getDirection() != Direction.LEFT){
+                            snake.setDirection(Direction.RIGHT);
+                            girando = true;
+                        }
+                        break;
+                    case KeyEvent.VK_UP:
+                        if(snake.getDirection() != Direction.DOWN){
+                            snake.setDirection(Direction.UP);
+                            girando = true;
+                        }
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        if(snake.getDirection() != Direction.UP){
+                            snake.setDirection(Direction.DOWN);
+                            girando = true;
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
             repaint();
         }
@@ -91,7 +100,8 @@ public class Board extends javax.swing.JPanel {
         MyKeyAdapter keyAdapter = new MyKeyAdapter();
         addKeyListener(keyAdapter);
         deltaTime = INITIAL_DELTA_TIME;
-        foodDeltaTime = 15000;
+        specialFoodDeltaTime = 15000;
+        girando = false;
         createSnakeTimer();
         createSpecialTimer();
         startTimers();
@@ -106,9 +116,16 @@ public class Board extends javax.swing.JPanel {
     public void restartTimers() {
         snakeTimer.restart();
         specialFoodTimer.restart();
-        specialFoodTimer.setDelay(foodDeltaTime);
+        specialFoodTimer.setDelay(specialFoodDeltaTime);
         snakeTimer.setDelay(INITIAL_DELTA_TIME);
         
+    }
+    
+    public void pauseGame(){
+        stopTimers();
+        JOptionPane.showMessageDialog(null,
+            "Pause");
+        startTimers();
     }
     
     
@@ -122,7 +139,7 @@ public class Board extends javax.swing.JPanel {
     }
      
     private void createSpecialTimer(){
-        specialFoodTimer = new Timer(foodDeltaTime, new ActionListener() {
+        specialFoodTimer = new Timer(specialFoodDeltaTime, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 specialLoop();
@@ -139,39 +156,44 @@ public class Board extends javax.swing.JPanel {
                if(colideNormalFood()){
                     snake.setRemainingNodes(1);
                     food = new Food(snake, false);
-                    scoreBoard.incrementScore(NORMAL_FOOD);
+                    //scoreBoard.incrementScore(NORMAL_FOOD);
+                    scoreDelegate.incrementScore(NORMAL_FOOD);
                     System.out.println("Normal");
                 } else {
+                    System.out.println("Antes");
                     specialFood = new Food(snake, true);
                     snake.setRemainingNodes(4);
-                    scoreBoard.incrementScore(SPECIAL_FOOD);
+                    //scoreBoard.incrementScore(SPECIAL_FOOD);
+                    scoreDelegate.incrementScore(SPECIAL_FOOD);
                     System.out.println("Especial");
+                    specialFoodOn = false;
                    
                }
                
-           }
-        repaint();
-        Toolkit.getDefaultToolkit().sync();
+            }
+            girando = false;
+            repaint();
+            Toolkit.getDefaultToolkit().sync();
         
         
         }
     }
     private void specialLoop(){
         //Method of SnakeFoodTimer
-         if (!specialFoodOn) {
-            System.out.println("Va");
+        
+        if (!specialFoodOn) {
             specialFood = new Food(snake, true);
             specialFoodOn = true;
-            int random = (int) (Math.random() * 10 + 50);
-            int randomTimer = (int) (Math.random() * 10000 + 30000);
-            snakeTimer.setDelay(random);
-            specialFoodTimer.setDelay(randomTimer);
+            int fast = INITIAL_DELTA_TIME;
+            fast -= 5;
+            snakeTimer.setDelay(fast);//La serpiente va mas rápido
+            //int timeToReturn = 1000;
+            //specialFoodTimer.setDelay(timeToReturn);
         } else {
             specialFoodOn = false;
             specialFood.desapear();
-            int randomTimer = (int) (Math.random() * 5000 + 7000);
-            specialFoodTimer.setDelay(randomTimer);
-            snakeTimer.setDelay(INITIAL_DELTA_TIME);
+            //specialFoodTimer.setDelay(10);
+            //snakeTimer.setDelay(INITIAL_DELTA_TIME);
             System.out.println("No va");
         }
         repaint();
@@ -187,7 +209,7 @@ public class Board extends javax.swing.JPanel {
     }
     
     public void setScoreBoard(ScoreBoard scoreBoard){
-        this.scoreBoard = scoreBoard;
+        this.scoreDelegate = scoreBoard;
     }
     
     public boolean colideFood() {
@@ -212,7 +234,8 @@ public class Board extends javax.swing.JPanel {
     
     public void gameOver() {
         stopTimers();
-        int score = scoreBoard.getScore();
+        //int score = scoreBoard.getScore();
+        int score = scoreDelegate.getScore();
         JOptionPane.showMessageDialog(null,
         "Game Over.\nYour size has been " + score);
         String nombre = JOptionPane.showInputDialog("Write your name.");
@@ -235,14 +258,15 @@ public class Board extends javax.swing.JPanel {
         snake = new Snake(5, 5, 1);
         food = new Food(snake, false);
         specialFood = new Food(snake, true);
-        scoreBoard.setScore(0);
+        //scoreBoard.setScore(0);
+        scoreDelegate.resetScore();
         specialFoodOn = false;
         setFocusable(true);
         specialFood = new Food(snake, true);
         MyKeyAdapter keyAdapter = new MyKeyAdapter();
         addKeyListener(keyAdapter);
         deltaTime = INITIAL_DELTA_TIME;
-        foodDeltaTime = 15000;
+        specialFoodDeltaTime = 15000;
         restartTimers();
         
                 
